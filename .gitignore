@@ -1,0 +1,6 @@
+vpn.conf
+vpn.auth
+*.ovpn
+
+.ssh/
+.vscode

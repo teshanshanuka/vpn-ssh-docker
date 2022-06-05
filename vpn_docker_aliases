@@ -1,0 +1,26 @@
+start_vpn_docker() {
+    SHARED_DIR=$HOME/shared
+    [ -d "$SHARED_DIR" ] || mkdir "$SHARED_DIR"
+
+    NUMD=$(( $(docker ps -af 'ancestor=vpnssh' | wc -l) - 1 ))
+
+    if [ $NUMD -eq 0 ]; then
+        docker run -it -d \
+                --cap-add=NET_ADMIN \
+                --device /dev/net/tun \
+                --name vpn \
+                -v $HOME/.ssh:$HOME/.ssh \
+                -v $SHARED_DIR:/shared \
+                vpnssh
+        echo "Wait..."
+        sleep 1
+        docker restart vpn
+    else
+        docker start vpn
+    fi
+}
+
+dssh() {
+    echo "ssh '$1' via docker..."
+    docker exec -it --user "$USER" vpn bash -c "ssh $1"
+}
