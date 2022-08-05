@@ -1,26 +1,44 @@
-start_vpn_docker() {
-    SHARED_DIR=$HOME/shared
-    [ -d "$SHARED_DIR" ] || mkdir "$SHARED_DIR"
+vpn_docker() {
+    case "$1" in
+    start)
+        SHARED_DIR=$HOME/shared
+        [ -d "$SHARED_DIR" ] || mkdir "$SHARED_DIR"
 
-    NUMD=$(( $(docker ps -af 'ancestor=vpnssh' | wc -l) - 1 ))
+        NUMD=$(( $(docker ps -af 'ancestor=borvpn' | wc -l) - 1 ))
 
-    if [ $NUMD -eq 0 ]; then
-        docker run -it -d \
-                --cap-add=NET_ADMIN \
-                --device /dev/net/tun \
-                --name vpn \
-                -v $HOME/.ssh:$HOME/.ssh \
-                -v $SHARED_DIR:/shared \
-                vpnssh
-        echo "Wait..."
-        sleep 1
-        docker restart vpn
-    else
-        docker start vpn
-    fi
-}
-
-dssh() {
-    echo "ssh '$1' via docker..."
-    docker exec -it --user "$USER" vpn bash -c "ssh $1"
+        if [ $NUMD -eq 0 ]; then
+            docker run -it -d \
+                    --cap-add=NET_ADMIN \
+                    --device /dev/net/tun \
+                    --name vpn \
+                    -v $HOME/.ssh:$HOME/.ssh \
+                    -v $SHARED_DIR:/shared \
+                    borvpn
+            echo "Wait..."
+            sleep 1
+            docker restart vpn
+        else
+            docker start vpn
+        fi
+        ;;
+    status)
+        docker ps -af 'name=vpn'
+        ;;
+    ssh)
+        docker exec -it --user "$USER" vpn bash -c "ssh $2"
+        ;;
+    shell)
+        docker exec -it --user "$USER" vpn bash
+        ;;
+    stop)
+        docker stop vpn
+        ;;
+    remove)
+        docker rm vpn
+        ;;
+    *)
+        echo "Usage: $0 start|status|ssh|shell|stop|remove"
+        return 1
+        ;;
+esac
 }

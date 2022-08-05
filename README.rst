@@ -2,7 +2,7 @@
 VPN docker client
 =================
 
-To ssh through vpn while listening to YouTube music uninterrupted.
+To ssh through vpn while listening to YouTube music uninterrupted. (using a ``.ovpn`` file)
 
 Based on `dperson/openvpn-client <https://hub.docker.com/r/dperson/openvpn-client>`_ docker image.
 
@@ -10,33 +10,45 @@ Based on `dperson/openvpn-client <https://hub.docker.com/r/dperson/openvpn-clien
 Setup
 -----
 
+Using an ``.ovpn`` file
++++++++++++++++++++++++
+
 1. Create a file ``vpn.auth`` containing your vpn username and password (Check ``vpn.auth.sample`` for reference)
 
-2. Run ``./build.sh``
+2. 2. Run ``./build.sh <XXX.ovpn>``
 
 Now the docker image ``vpnssh`` is ready to go!
 
-------------------
+-----
+Usage
+-----
+
+1. Source ``vpn_docker_aliases``
+
+2. ``vpn_docker start`` to start the container running
+
+3. To ssh, you can ``vpn_docker ssh MySSHConfig.vpn`` to ssh into *MySSHConfig* (A config in ``~/.ssh/config``) 
+   (Or you can just specify the IP)
+
+4. It is a tiny lightweight docker. But you can do ``vpn_docker stop`` if you do not like it to keep running after 
+   you use it.
+
+-----
+TL;DR
+-----
+
 Aliases for sshing
-------------------
+++++++++++++++++++
 
 There are some aliases in ``vpn_docker_aliases`` to make it easier to ssh using the docker. 
 Source it in your ``.[shell]rc`` if you want them readily available.
 
-Start the docker
-++++++++++++++++
+vpn_docker
+----------
 
-The function ``start_vpn_docker`` can be used for this. I added a shared directory (``$HOME/shared``) so that I 
-can ``scp`` from / to the docker and have the files available in the host. Remove all lines containing ``SHARED_DIR`` 
-if you do not want this.
-
-This function will mount your ``~/.ssh`` directory inside the docker making all your ssh configs available inside
-the docker for user ``$USER``.
-
-SSH using the docker
-++++++++++++++++++++
-
-Use function ``dssh`` just like you would use ``ssh``.
+The function ``vpn_docker`` can be used to start, stop or ssh using the created docker. I added a shared directory 
+(``$HOME/shared``) so that I can ``scp`` from / to the docker and have the files available in the host. Remove all 
+lines containing ``SHARED_DIR`` if you do not want this.
 
 -------------------------------------
 Running the docker for other purposes
